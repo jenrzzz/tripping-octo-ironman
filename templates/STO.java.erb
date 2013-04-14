@@ -1,0 +1,49 @@
+public class <%= @name %><%=" extends #{@extends}" if @extends %> {
+
+    public <%= @name %>(String name) {
+        super(name);
+    }
+
+    public <%= @name %>(String name, Type t) {
+        super(name, t);
+        <%= "setIsAddressable(true);" if @addressable %>
+        <%= "setIsModifiable(true);" if @modifiable %>
+    }
+
+<% if @expr %>
+    public boolean isExpr() {
+        return true;
+    }
+
+<% end %>
+<% if @var %>
+    public boolean isVar() {
+        return true;
+    }
+
+<% end %>
+<% if @const %>
+    public boolean isConst() {
+        return true;
+    }
+
+<% end %>
+<% if @func %>
+    public boolean isFunc() {
+        return true;
+    }
+
+<% end %>
+<% if @typedef %>
+    public boolean isTypedef() {
+        return true;
+    }
+
+<% end %>
+<% if @error %>
+    public boolean isError() {
+        return true;
+    }
+
+<% end %>
+}

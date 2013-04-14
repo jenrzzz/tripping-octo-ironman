@@ -1,0 +1,50 @@
+public class <%= @name %><%= " extends #{@extends}" if @extends %> {
+    public final String type = "<%= @type %>";
+
+    public <%= @name %>(int nCode) {
+        super(nCode);
+    }
+
+<% if @binary %>
+    <% if not @extends %>
+    public boolean check(STO left, STO right) {
+        return checkOperands(STO left, STO right);
+    }
+
+    <% end %>
+    public boolean checkOperands(STO left, STO right) {
+    <% case @check; when 'numeric' %>
+        return left.getType().isNumeric() && right.getType().isNumeric();
+    <% when 'float' %>
+        return left.getType().isFloat() && right.getType().isFloat();
+    <% when 'boolean' %>
+        return left.getType().isBool() && right.getType().isBool();
+    <% when 'array' %>
+        return left.getType().isArray() && right.getType().isArray();
+    <% when 'struct' %>
+        return left.getType().isStruct() && right.getType().isStruct();
+    <% when 'pointer' %>
+        return left.getType().isPointer() && right.getType().isPointer();
+    <% else %>
+        // TODO: type check
+    <% end %>
+    }
+<% elsif @unary %>
+    public boolean check(STO operand) {
+    <% case @check; when 'numeric' %>
+        return operand.getType().isNumeric()
+    <% when 'float' %>
+        return operand.getType().isFloat()
+    <% when 'boolean' %>
+        return operand.getType().isBool()
+    <% when 'array' %>
+        return operand.getType().isArray()
+    <% when 'struct' %>
+        return operand.getType().isStruct()
+    <% when 'pointer' %>
+        return operand.getType().isPointer()
+    <% else %>
+        // TODO: type check
+    <% end %>
+<% end %>
+}

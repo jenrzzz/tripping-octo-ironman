@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+
+require 'erb'
+require 'ostruct'
+require 'trollop'
+
+class RenderContext
+    attr_accessor :name, :extends, :type
+
+    def initialize(name, extends)
+        @name = name
+        @extends = extends
+    end
+
+    def get_binding
+        binding
+    end
+end
+
+def generate_type(name, extends, type)
+    context = RenderContext.new(name, extends)
+    context.type = type
+    File.open('templates/Type.java.erb') do |f|
+        template = ERB.new f.read
+        template.run context.get_binding
+    end
+end
+
+SUB_CMDS = %w(type sto operator)
+global_opts = Trollop::options do
+    banner "Code generator for objects for our parser."
+    stop_on SUB_CMDS
+end
+
+cmd = ARGV.shift
+case cmd
+when 'type'
+    opts = Trollop::options do
+        opt :name, "Class name", type: :string
+        opt :extends, "The name of the class that the generated class should extend", type: :string
+        opt :type, "The type of this Type: one of [integer, float, array, struct, pointer, void]", type: :string
+    end
+    generate_type opts[:name], opts[:extends], opts[:type]
+when 'operator'
+    opts = Trollop::options do
+        opt :name, "Class name", type: :string
+        opt :extends, "The name of the class that the generated class should extend", type: :string
+        opt :type, "The type of this operator.", type: :string
+    end
+end
+
+
+
+
+

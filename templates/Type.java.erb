@@ -1,0 +1,60 @@
+public class <%= @name %><%= " extends #{@extends}" if @extends %> {
+
+    public <%= @name %>(String strName, int size) {
+        super(strName, size);
+    }
+
+<% case @type; when 'integer' %>
+    public boolean isInt() {
+        return true;
+    }
+
+    public boolean isNumeric() {
+        return true;
+    }
+
+<% when 'float' %>
+    public boolean isFloat() {
+        return true;
+    }
+
+    public boolean isNumeric() {
+        return true;
+    }
+
+<% when 'array' %>
+    public boolean isArray() {
+        return true;
+    }
+
+    public boolean isComposite() {
+        return true;
+    }
+
+<% when 'struct' %>
+    public boolean isStruct() {
+        return true;
+    }
+
+    public boolean isComposite() {
+        return true;
+    }
+
+<% when 'pointer' %>
+    public boolean isPointer() {
+        return true;
+    }
+
+    public boolean isComposite() {
+        return true;
+    }
+
+<% when 'void' %>
+    public boolean isVoid() {
+        return true;
+    }
+<% else %>
+    // TODO: override methods -- what type is this?
+
+<% end %>
+}
