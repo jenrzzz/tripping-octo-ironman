@@ -1,55 +1,65 @@
 #!/usr/bin/env ruby
 
 require 'erb'
-require 'ostruct'
 require 'trollop'
 
 class RenderContext
-    attr_accessor :name, :extends, :type
+  attr_accessor :name, :extends, :type, :arity, :check
+  def initialize(name, extends)
+    @name = name
+    @extends = extends
+  end
 
-    def initialize(name, extends)
-        @name = name
-        @extends = extends
-    end
-
-    def get_binding
-        binding
-    end
+  def get_binding
+    binding
+  end
 end
 
 def generate_type(name, extends, type)
-    context = RenderContext.new(name, extends)
-    context.type = type
-    File.open('templates/Type.java.erb') do |f|
-        template = ERB.new f.read
-        template.run context.get_binding
-    end
+  context = RenderContext.new(name, extends)
+  context.type = type
+  File.open('templates/Type.java.erb') do |f|
+    template = ERB.new f.read
+    template.run context.get_binding
+  end
 end
+
+def generate_operator(name, extends, type, arity, check)
+  context = RenderContext.new(name, extends)
+  context.type = type
+  context.arity = arity
+  context.check = check
+  File.open('templates/Operator.java.erb') do |f|
+    template = ERB.new f.read
+    template.run context.get_binding
+  end
+end
+
 
 SUB_CMDS = %w(type sto operator)
 global_opts = Trollop::options do
-    banner "Code generator for objects for our parser."
-    stop_on SUB_CMDS
+  banner "Code generator for objects for our parser."
+  stop_on SUB_CMDS
 end
 
 cmd = ARGV.shift
 case cmd
 when 'type'
-    opts = Trollop::options do
-        opt :name, "Class name", type: :string
-        opt :extends, "The name of the class that the generated class should extend", type: :string
-        opt :type, "The type of this Type: one of [integer, float, array, struct, pointer, void]", type: :string
-    end
-    generate_type opts[:name], opts[:extends], opts[:type]
+  opts = Trollop::options do
+    opt :name, "Class name", type: :string
+    opt :extends, "The name of the class that the generated class should extend", type: :string
+    opt :type, "The type of this Type: one of [integer, float, array, struct, pointer, void]", type: :string
+  end
+  generate_type opts[:name], opts[:extends], opts[:type]
 when 'operator'
-    opts = Trollop::options do
-        opt :name, "Class name", type: :string
-        opt :extends, "The name of the class that the generated class should extend", type: :string
-        opt :type, "The type of this operator.", type: :string
-    end
+  opts = Trollop::options do
+    opt :name, "Class name", type: :string
+    opt :extends, "The name of the class that the generated class should extend", type: :string
+    opt :type, "The type of this operator, e.g. 'arithmetic'", type: :string
+    opt :arity, "The integer arity of this operator -- binary (2), unary (1)", type: :integer
+    opt :check, "The required type checking for this operator. " +
+          "Both operands (if applicable) will be checked with the same criteria." +
+          "Valid options are ['numeric', 'float', 'boolean', 'array', 'struct', 'pointer']", type: :string
+  end
+  generate_operator opts[:name], opts[:extends], opts[:type], opts[:arity], opts[:check]
 end
-
-
-
-
-
